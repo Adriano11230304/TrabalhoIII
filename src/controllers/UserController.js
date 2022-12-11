@@ -1,5 +1,4 @@
 const { User } = require("../models/User");
-const { post } = require("../routes/userRoutes");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -10,9 +9,38 @@ class UserController{
     }
 
     async auth(req, res){
-        /*let token = jwt.sign(user, app.get('superSecret'), {
-            expiresIn: '1440m'
-        })*/
+        const { email, password } = req.body;
+        let passwordCrypt;
+        let user;
+        var token = '';
+        const users = await User.findAll();
+        for(let i = 0; i < users.length; i++){
+            passwordCrypt = await bcrypt.compare(password, users[i].password);
+            if(passwordCrypt && users[i].email == email){
+                console.log('entrou');
+                user = users[i];
+                token = jwt.sign({ user: user }, 'publicKey', { expiresIn: '5min' });
+            }
+        }
+
+        console.log('Token:', token);
+
+        res.status(200).json(token);
+    }
+
+    verifyToken(req, res){
+        let token = req.body.token;
+        const validy = jwt.verify(token, 'publicKey', function (err, decoded) {
+            if(err){
+                res.status(400).json(err);
+            }else{
+                res.status(400).json(decoded.user);
+            }
+        });
+        console.log(validy);
+        res.status(200).json('OK');
+
+
     }
 
     async add(req, res){
