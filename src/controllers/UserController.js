@@ -1,46 +1,40 @@
 const { User } = require("../models/User");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { func } = require("joi");
 
 class UserController{
     async list(req, res){
-        const users = await User.findAll();
-        res.status(200).json(users);
+        let token = req.body.token;
+        let validingToken = validyToken(token);
+        if (validingToken.valid){
+            const users = await User.findAll();
+            res.status(200).json(users);
+        }else{
+            res.status(400).json(validingToken.msg);
+        }
+        
     }
 
     async auth(req, res){
         const { email, password } = req.body;
         let passwordCrypt;
         let user;
+        let userExist = false;
         var token = '';
         const users = await User.findAll();
         for(let i = 0; i < users.length; i++){
             passwordCrypt = await bcrypt.compare(password, users[i].password);
             if(passwordCrypt && users[i].email == email){
-                console.log('entrou');
                 user = users[i];
                 token = jwt.sign({ user: user }, 'publicKey', { expiresIn: '5min' });
+                userExist = true;
             }
         }
 
-        console.log('Token:', token);
+        let msg = userExist ? 'Usuário autenticado!' : 'Usuário não existente!';
 
-        res.status(200).json(token);
-    }
-
-    verifyToken(req, res){
-        let token = req.body.token;
-        const validy = jwt.verify(token, 'publicKey', function (err, decoded) {
-            if(err){
-                res.status(400).json(err);
-            }else{
-                res.status(400).json(decoded.user);
-            }
-        });
-        console.log(validy);
-        res.status(200).json('OK');
-
-
+        res.status(200).json({token, msg});
     }
 
     async add(req, res){
@@ -55,7 +49,6 @@ class UserController{
         }
         if(!userExist){
             const passwordCrypt = await bcrypt.hash(password, 10);
-            console.log(passwordCrypt);
             await User.create({
                 email: email,
                 password: passwordCrypt,
@@ -84,6 +77,27 @@ class UserController{
             res.status(400).json('Usário não existe!');
         }
     }
+}
+
+function validyToken(token){
+    let res;
+    jwt.verify(token, 'publicKey', function (err, decoded) {
+        if (err) {
+            res = {
+                "msg": 'Token inválido',
+                "valid": false
+            };
+        } else {
+            res = {
+                "token" : token,
+                "valid": true,
+                "msg": 'Token valido!',
+                "user": decoded.user
+            }   
+        }
+    });
+
+    return res;
 }
 
 module.exports = UserController;

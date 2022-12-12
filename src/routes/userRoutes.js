@@ -7,6 +7,5 @@ userRouter.get('/', userController.list);
 userRouter.post('/add', userController.add);
 userRouter.delete('/remove', userController.remove);
 userRouter.post('/auth', userController.auth);
-userRouter.post('/token', userController.verifyToken);
 
 module.exports = userRouter;
