@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require('../persistencia/configDB');
+const jwt = require('jsonwebtoken');
 
 const User = sequelize.define('User', {
     id: {
@@ -15,4 +16,25 @@ const User = sequelize.define('User', {
     modelName: 'users'
 });
 
-module.exports = { User };
+function validyToken(token) {
+    let res;
+    jwt.verify(token, 'publicKey', function (err, decoded) {
+        if (err) {
+            res = {
+                "msg": 'Token inválido!',
+                "valid": false
+            };
+        } else {
+            res = {
+                "token": token,
+                "valid": true,
+                "msg": 'Token valido!',
+                "user": decoded.user
+            }
+        }
+    });
+
+    return res;
+}
+
+module.exports = { User, validyToken };

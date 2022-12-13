@@ -1,17 +1,15 @@
-const { User } = require("../models/User");
+const { User, validyToken } = require("../models/User");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { func } = require("joi");
 
 class UserController{
     async list(req, res){
-        let token = req.body.token;
-        let validingToken = validyToken(token);
-        if (validingToken.valid){
+        let token = validyToken(req.body.token);
+        if (token.valid){
             const users = await User.findAll();
             res.status(200).json(users);
         }else{
-            res.status(400).json(validingToken.msg);
+            res.status(400).json(token.msg);
         }
         
     }
@@ -52,55 +50,35 @@ class UserController{
             await User.create({
                 email: email,
                 password: passwordCrypt,
-                nome: nome,
-                createdAt: new Date() 
+                nome: nome
             });
             res.status(200).json('Usuário adicionado com sucesso!');
         }
     }
 
     async remove(req, res){
+        const token = validyToken(req.body.token);
+        if(!token.valid){
+            res.status(400).json(token.msg);
+        }
         let user;
         user = await User.findOne({
             where: {
                 id: req.body.id
             }
         });
-        
-        
-        console.log(user);
-        if(user){
+        if (user) {
             await User.destroy({
-                where:{
+                where: {
                     id: req.body.id
                 }
             });
             res.status(200).json('Usuário deletado com sucesso!');
-        }else{
-            res.status(400).json('Usário não existe!');
-        }
-    }
-}
-
-function validyToken(token){
-    let res;
-    jwt.verify(token, 'publicKey', function (err, decoded) {
-        if (err) {
-            res = {
-                "msg": 'Token inválido',
-                "valid": false
-            };
         } else {
-            res = {
-                "token" : token,
-                "valid": true,
-                "msg": 'Token valido!',
-                "user": decoded.user
-            }   
+            res.status(400).json('Usuário não existe!');
         }
-    });
-
-    return res;
+        
+    }
 }
 
 module.exports = UserController;
