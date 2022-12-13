@@ -15,17 +15,4 @@ const User = sequelize.define('User', {
     modelName: 'users'
 });
 
-/*const validyToken = (token) => {
-    jwt.verify(token, 'publicKey', function (err, decoded) {
-        if (err) {
-            res.status(400).json("Token inválido!");
-        } else {
-            res.status(200).json({
-                token,
-                msg: 'Token valido!'
-            })
-        }
-    });
-}*/
-
 module.exports = { User };

@@ -52,21 +52,24 @@ class UserController{
             await User.create({
                 email: email,
                 password: passwordCrypt,
-                nome: nome
+                nome: nome,
+                createdAt: new Date() 
             });
             res.status(200).json('Usuário adicionado com sucesso!');
         }
     }
 
     async remove(req, res){
-        const users = await User.findAll();
-        let userExist = false;
-        users.forEach(user => {
-            if(user.id == req.body.id){
-                userExist = true;
+        let user;
+        user = await User.findOne({
+            where: {
+                id: req.body.id
             }
-        })
-        if(userExist){
+        });
+        
+        
+        console.log(user);
+        if(user){
             await User.destroy({
                 where:{
                     id: req.body.id
