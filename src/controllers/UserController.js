@@ -4,19 +4,12 @@ const jwt = require('jsonwebtoken');
 
 class UserController{
     async list(req, res){
-        let token = validyToken(req.headers.token);
-        if (token.valid){
-            const users = await User.findAll();
-            res.status(200).json(users);
-        }else{
-            res.status(400).json(token.msg);
-        }
-        
+        const users = await User.findAll();
+        res.status(200).json(users);
     }
 
     async auth(req, res){
         const { email, password } = req.body;
-        console.log(req.body);
         let passwordCrypt;
         let user;
         let userExist = false;
@@ -58,10 +51,6 @@ class UserController{
     }
 
     async remove(req, res){
-        const token = validyToken(req.headers.token);
-        if(!token.valid){
-            res.status(400).json(token.msg);
-        }
         let user;
         user = await User.findOne({
             where: {
