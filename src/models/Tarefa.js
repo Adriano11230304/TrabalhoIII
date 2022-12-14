@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require('../persistencia/configDB');
 
-const Todo = sequelize.define('Todo', {
+const Tarefa = sequelize.define('Tarefa', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -12,7 +12,7 @@ const Todo = sequelize.define('Todo', {
     dateConclusion: DataTypes.DATE
 }, {
     timestamps: true,
-    modelName: 'todo'
+    modelName: 'tarefa'
 });
 
-module.exports = { Todo };
+module.exports = { Tarefa };

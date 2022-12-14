@@ -1,11 +1,11 @@
 const { User } = require('./User');
-const { Todo } = require('./Todo');
+const { Tarefa } = require('./Tarefa');
 
 const sequelize = require('../persistencia/configDB');
 
 console.log('Sync Models');
 
-User.hasMany(Todo);
-Todo.belongsTo(User);
+User.hasMany(Tarefa);
+Tarefa.belongsTo(User);
 
 sequelize.sync();

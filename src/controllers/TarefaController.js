@@ -1,12 +1,12 @@
-const { Todo } = require('../models/Todo');
+const { Tarefa } = require('../models/Tarefa');
 const { validyToken } = require('../models/User');
 
-class TodoController{
+class TarefaController{
     async list(req, res){
-        const token = validyToken(req.body.token);
+        const token = validyToken(req.headers.token);
         if(token.valid){
-            const todos = await Todo.findAll();
-            res.status(200).json(todos);
+            const tarefas = await Tarefa.findAll();
+            res.status(200).json(tarefas);
         }else{
             res.status(400).json(token.msg);
         }
@@ -15,9 +15,9 @@ class TodoController{
 
     async add(req, res){
         const { title, description, dateConclusion } = req.body;
-        const token = validyToken(req.body.token);
+        const token = validyToken(req.headers.token);
         if(token.valid){
-            await Todo.create({
+            await Tarefa.create({
                 title: title,
                 description: description,
                 dateConclusion: dateConclusion,
@@ -32,17 +32,17 @@ class TodoController{
     }
 
     async delete(req, res){
-        const token = validyToken(req.body.token);
+        const token = validyToken(req.headers.token);
         if(!token.valid){
             res.status(400).json(token.msg);
         }
-        const todo = await Todo.findOne({
+        const tarefa = await Tarefa.findOne({
             where:{
                 id: req.body.id
             }
         })
         if(todo){
-            await Todo.destroy({
+            await Tarefa.destroy({
                 where: {
                     id: req.body.id
                 }
@@ -51,9 +51,27 @@ class TodoController{
         }else{
             res.status(400).json('Tarefa inexistente!');
         }
+    }
 
-        
+    async update(req, res){
+        const { title, description, dateConclusion } = req.body;
+        const token = validyToken(req.headers.token);
+        if(token.valid){
+            await Tarefa.update({
+                title: title,
+                description: description,
+                dateConclusion: dateConclusion
+            },{
+                where:{
+                    id: req.body.id
+                }
+            })
+
+            res.status(200).json('Tarefa alterada com sucesso!');
+        }else{
+            res.status(400).json('Token inválido!');
+        }
     }
 }
 
-module.exports = TodoController;
+module.exports = TarefaController;
