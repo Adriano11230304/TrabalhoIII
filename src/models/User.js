@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require('../persistencia/configDB');
-const jwt = require('jsonwebtoken');
 
 const User = sequelize.define('User', {
     id: {
@@ -13,7 +12,7 @@ const User = sequelize.define('User', {
     nome: DataTypes.STRING
 }, {
     timestamps: true,
-    modelName: 'users'
+    modelName: 'user'
 });
 
 module.exports = { User };

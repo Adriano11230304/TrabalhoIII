@@ -1,16 +1,39 @@
-const { Categoria } = require('../models/Categoria');
+const { Category } = require('../models/Category');
+const { UserCategory } = require('../models/UserCategory');
 
 class CategoriaController{
 
     async list(req, res){
-        const categorias = await Categoria.findAll();
+        const user = req.headers.user;
+        const UserCategorys = await UserCategory.findAll({
+            where:{
+                UserId: user.id
+            }
+        })
+        const categorias = [];
+        let categoria;
+        for(let i = 0; i < UserCategorys.length; i++){
+            categoria = await Category.findOne({
+                where: {
+                    id: UserCategorys[i].CategoryId
+                }
+            })
+            categorias.push(categoria)
+        }        
+        
         res.status(200).json(categorias);
     }
 
     async add(req, res){
         const { description } = req.body;
-        await Categoria.create({
+        const user = req.headers.user
+        const category = await Category.create({
             description: description
+        })
+        
+        await UserCategory.create({
+            UserId: user.id,
+            CategoryId: category.id
         })
 
         res.status(200).json('Categoria criada com sucesso!');

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../persistencia/configDB');
 
-const Categoria = sequelize.define('Categoria', {
+const Category = sequelize.define('Category', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -10,7 +10,7 @@ const Categoria = sequelize.define('Categoria', {
     description: DataTypes.STRING
 },{
     timestamps: false,
-    modelName: 'categoria'
+    modelName: 'category'
 });
 
-module.exports = { Categoria };
+module.exports = { Category };

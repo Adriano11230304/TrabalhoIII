@@ -5,6 +5,7 @@ const isAuth = (req, res, next) => {
             res.status(400).json('Token inválido!');
         } else {
             req.headers.user = decoded.user;
+            
             next();
         }
     });
