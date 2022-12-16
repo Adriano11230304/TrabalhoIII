@@ -1,17 +1,22 @@
 const { Tarefa } = require('../models/Tarefa');
+const { Op } = require("sequelize");
 
 class TarefaController{
     async list(req, res){
-        const tarefas = await Tarefa.findAll();
+        const tarefas = await Tarefa.findAll({
+            where:{
+                UserId: req.headers.user.id
+            }
+        });
         res.status(200).json(tarefas);
     }
 
     async add(req, res){
-        const { title, description, completionForecast } = req.body;
+        const { title, description, completionPrevision } = req.body;
         await Tarefa.create({
             title: title,
             description: description,
-            completionForecast: completionForecast,
+            completionPrevision: completionPrevision,
             UserId: req.headers.user.id,
             completed: false
         })
@@ -38,11 +43,11 @@ class TarefaController{
     }
 
     async update(req, res){
-        const { title, description, completionForecast } = req.body;
+        const { title, description, completionPrevision } = req.body;
         await Tarefa.update({
             title: title,
             description: description,
-            completionForecast: completionForecast
+            completionPrevision: completionPrevision
         },{
             where:{
                 id: req.body.id
@@ -76,6 +81,32 @@ class TarefaController{
         }else{
             res.status(400).json('Tarefa não existe!');
         }
+    }
+
+    async tarefasPendentes(req, res){
+        const user = req.headers.user;
+        const tarefas = await Tarefa.findAll({
+            where: {
+                completed: false,
+                userId: user.id
+            }
+        })
+
+        res.status(200).json(tarefas);
+    }
+
+    async tarefasAtrasadas(req, res) {
+        const user = req.headers.user;
+        const date = new Date();
+        const tarefas = await Tarefa.findAll({
+            where: {
+                completed: false,
+                UserId: user.id,
+                completionPrevision: {[Op.lt]: date}
+            }
+        })
+
+        res.status(200).json(tarefas);
     }
 }
 
