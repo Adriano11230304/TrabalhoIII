@@ -7,12 +7,13 @@ class TarefaController{
     }
 
     async add(req, res){
-        const { title, description, dateConclusion } = req.body;
+        const { title, description, completionForecast } = req.body;
         await Tarefa.create({
             title: title,
             description: description,
-            dateConclusion: dateConclusion,
-            UserId: token.user.id
+            completionForecast: completionForecast,
+            UserId: req.headers.user.id,
+            completed: false
         })
 
         res.status(200).json('Tarefa adicionada com sucesso!');
@@ -24,7 +25,7 @@ class TarefaController{
                 id: req.body.id
             }
         })
-        if(todo){
+        if(tarefa){
             await Tarefa.destroy({
                 where: {
                     id: req.body.id
@@ -37,11 +38,11 @@ class TarefaController{
     }
 
     async update(req, res){
-        const { title, description, dateConclusion } = req.body;
+        const { title, description, completionForecast } = req.body;
         await Tarefa.update({
             title: title,
             description: description,
-            dateConclusion: dateConclusion
+            completionForecast: completionForecast
         },{
             where:{
                 id: req.body.id
@@ -49,6 +50,32 @@ class TarefaController{
         })
 
         res.status(200).json('Tarefa alterada com sucesso!');
+    }
+
+    async ckeckTarefa(req, res){
+        const tarefa = await Tarefa.findOne({
+            where: {
+                id: req.body.id
+            }
+        });
+
+        if(tarefa){
+            if(!tarefa.completed){
+                await Tarefa.update({
+                    completed: true,
+                    dateConclusion: new Date()
+                },{
+                    where: {
+                        id: req.body.id
+                    }
+                })
+                res.status(200).json('Tarefa completa!');
+            }else{
+                res.status(400).json('Tarefa já está completa!');
+            }
+        }else{
+            res.status(400).json('Tarefa não existe!');
+        }
     }
 }
 

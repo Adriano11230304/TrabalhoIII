@@ -9,6 +9,7 @@ const Tarefa = sequelize.define('Tarefa', {
     },
     title: DataTypes.STRING,
     description: DataTypes.STRING,
+    completionForecast: DataTypes.DATE,
     dateConclusion: DataTypes.DATE,
     completed: DataTypes.BOOLEAN
 }, {
