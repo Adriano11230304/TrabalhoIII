@@ -5,8 +5,12 @@ const jwt = require('jsonwebtoken');
 
 class UserController{
     async list(req, res){
-        const users = await User.findAll();
-        res.status(200).json(users);
+        const user = await User.findOne({
+            where:{
+                id: req.headers.user.id
+            }
+        });
+        res.status(200).json(user);
     }
 
     async auth(req, res){
@@ -37,11 +41,10 @@ class UserController{
         };
         const errors = validate(validateUser);
         const msgs = [];
-        errors.details.forEach(error => {
-            msgs.push(error.message);
-        })
-
-        if(msgs.length > 0){
+        if(errors){
+            errors.details.forEach(error => {
+                msgs.push(error.message);
+            })
             res.status(400).json(msgs);
         }
 
@@ -71,7 +74,7 @@ class UserController{
                 id: req.body.id
             }
         });
-        if (user) {
+        if (user && user.id == req.headers.user.id) {
             await User.destroy({
                 where: {
                     id: req.body.id
