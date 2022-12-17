@@ -1,7 +1,7 @@
 const express = require('express');
 const userRouter = express.Router();
 const UserController = require('../controllers/UserController');
-const { isAuth } = require('../middlewares/Auth');
+const { isAuth } = require('../middlewares/middleware');
 const userController = new UserController;
 
 userRouter.get('/', isAuth, userController.list);

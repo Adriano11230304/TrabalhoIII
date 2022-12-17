@@ -44,21 +44,12 @@ class TarefaController{
     }
 
     async delete(req, res){
-        const tarefa = await Tarefa.findOne({
-            where:{
+        await Tarefa.destroy({
+            where: {
                 id: req.body.id
             }
-        })
-        if(tarefa){
-            await Tarefa.destroy({
-                where: {
-                    id: req.body.id
-                }
-            });
-            res.status(200).json('Tarefa excluída com sucesso!');
-        }else{
-            res.status(400).json('Tarefa inexistente!');
-        }
+        });
+        res.status(200).json('Tarefa excluída com sucesso!');
     }
 
     async update(req, res){
