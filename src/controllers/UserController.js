@@ -1,4 +1,5 @@
 const { User, validyToken } = require("../models/User");
+const { validate } = require('../middlewares/validators');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -31,6 +32,19 @@ class UserController{
 
     async add(req, res){
         const {email, nome, password } = req.body;
+        const validateUser = {
+            email, nome, password
+        };
+        const errors = validate(validateUser);
+        const msgs = [];
+        errors.details.forEach(error => {
+            msgs.push(error.message);
+        })
+
+        if(msgs.length > 0){
+            res.status(400).json(msgs);
+        }
+
         const users = await User.findAll();
         let userExist = false;
         for(let i = 0; i < users.length; i++){
