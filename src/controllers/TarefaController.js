@@ -1,5 +1,7 @@
 const { Tarefa } = require('../models/Tarefa');
+const { TarefaCategory } = require('../models/TarefaCategory');
 const { Op } = require("sequelize");
+const { Category } = require('../models/Category');
 
 class TarefaController{
     async list(req, res){
@@ -13,14 +15,31 @@ class TarefaController{
 
     async add(req, res){
         const { title, description, completionPrevision } = req.body;
-        await Tarefa.create({
+        const { categoriaTarefa } = req.body;
+        const user = req.headers.user;
+
+        const tarefa = await Tarefa.create({
             title: title,
             description: description,
             completionPrevision: completionPrevision,
-            UserId: req.headers.user.id,
+            UserId: user.id,
             completed: false
         })
-
+        
+        if(categoriaTarefa){
+            const categoria = await Category.findOne({
+                where: {
+                    id: categoriaTarefa
+                }
+            })
+            if (categoriaTarefa && categoria.UserId == user.id) {
+                await TarefaCategory.create({
+                    CategoryId: categoriaTarefa,
+                    TarefaId: tarefa.id
+                })
+            }
+        }
+        
         res.status(200).json('Tarefa adicionada com sucesso!');
     }
 

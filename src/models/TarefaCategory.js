@@ -4,11 +4,6 @@ const { Category } = require('./Category');
 const { Tarefa } = require('./Tarefa');
 
 const TarefaCategory = sequelize.define('TarefaCategory', {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
-    },
     TarefaId: {
         type: DataTypes.INTEGER,
         references: {
