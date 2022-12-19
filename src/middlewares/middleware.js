@@ -15,10 +15,12 @@ const isAuth = (req, res, next) => {
 const isAutor = async (req, res, next) => {
     const user = req.headers.user;
     const tarefa = await Tarefa.findOne({
-        id: req.body.id,
-        UserId: user.id
+        where:{
+            id: req.body.id,
+            UserId: user.id
+        }
     })
-
+    console.log(tarefa);
     if(tarefa){
         next();
     }else{
@@ -26,4 +28,4 @@ const isAutor = async (req, res, next) => {
     }
 }
 
-module.exports = { isAuth };
+module.exports = { isAuth, isAutor };
